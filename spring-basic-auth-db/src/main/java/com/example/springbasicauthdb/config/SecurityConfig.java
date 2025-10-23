@@ -1,5 +1,6 @@
 package com.example.springbasicauthdb.config;
 
+import com.example.springbasicauthdb.security.CustomAuthenticationManager;
 import com.example.springbasicauthdb.service.CustomUserDetailsService;
 import jakarta.persistence.Entity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +23,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     @Autowired
-    CustomUserDetailsService userDetailsService;
-
+    private AuthenticationManager customAuthenticationManager;
 
     @Bean
     public SecurityFilterChain customSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -38,17 +39,5 @@ public class SecurityConfig {
                 .httpBasic(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationManager customAuthenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider(userDetailsService);
-        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
-        return new ProviderManager(daoAuthenticationProvider);
     }
 }
