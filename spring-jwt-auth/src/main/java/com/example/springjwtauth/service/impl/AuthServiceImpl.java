@@ -42,11 +42,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String generateToken(UserDetails userDetails) {
-        return Jwts.builder()
-                .subject(userDetails.getUsername())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis()+jwtUtil.getExpiration()))
-                .signWith(jwtUtil.getSecretKey())
-                .compact();
+        return jwtUtil.generateToken(userDetails);
     }
 }
