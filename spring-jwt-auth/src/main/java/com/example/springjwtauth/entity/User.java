@@ -1,14 +1,14 @@
 package com.example.springjwtauth.entity;
 
+import com.example.springjwtauth.entity.dto.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -31,11 +31,21 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return new ArrayList<>();
-    }
+    public Set<SimpleGrantedAuthority> getAuthorities() {
+        Set<SimpleGrantedAuthority> grantedAuthorities = new HashSet<>();
 
+        // Adding role as simple granted authority
+        grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_"+role.name()));
+        // Adding permission as simple granted authority
+        grantedAuthorities.addAll(
+                role.getPermissions().stream().map(
+                        permission -> new SimpleGrantedAuthority(permission.name())
+                ).collect(Collectors.toSet())
+        );
+
+        // Returning set of simple granted authorities
+        return grantedAuthorities;
+    }
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -54,9 +64,5 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    public enum Role {
-        USER, ADMIN
     }
 }
