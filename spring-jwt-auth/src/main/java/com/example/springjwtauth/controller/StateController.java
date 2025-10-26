@@ -18,7 +18,7 @@ public class StateController {
     StateService stateService;
 
     @GetMapping
-    public List<State> getAllStates() {
+    public List<State> createState() {
         return stateService.getAllStates();
     }
 
